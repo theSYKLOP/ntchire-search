@@ -1,15 +1,14 @@
 import { PrismaClient } from '@prisma/client'
-import { searchPages, mapFacebookPageToCompany, FacebookApiError } from '../../utils/facebook'
 import { analyzeGabonCompany } from '../../utils/huggingface'
 
 const prisma = new PrismaClient()
 
-// Données mock pour le développement
+// Données mock réalistes d'entreprises gabonaises
 const mockGabonCompanies = [
   {
     id: 'mock-1',
     name: 'Restaurant Le Gabonais',
-    bio: 'Restaurant traditionnel gabonais à Libreville. Spécialités locales, poissons frais, plantain et manioc. #Gabon #Libreville #RestaurantGabonais',
+    bio: 'Restaurant traditionnel gabonais à Libreville. Spécialités locales, poissons frais, plantain et manioc. #Gabon #Libreville #RestaurantGabonais #MadeInGabon',
     profileImage: 'https://via.placeholder.com/150/4CAF50/FFFFFF?text=RG',
     platform: 'facebook' as const,
     profileUrl: 'https://facebook.com/restaurant-legabonais',
@@ -28,7 +27,7 @@ const mockGabonCompanies = [
   {
     id: 'mock-2',
     name: 'Tech Gabon Solutions',
-    bio: 'Solutions technologiques pour les entreprises gabonaises. Développement web, applications mobiles, digitalisation. 100% gabonais ! #GabonTech #InnovationGabon',
+    bio: 'Solutions technologiques pour les entreprises gabonaises. Développement web, applications mobiles, digitalisation. 100% gabonais ! #GabonTech #InnovationGabon #PortGentil',
     profileImage: 'https://via.placeholder.com/150/2196F3/FFFFFF?text=TGS',
     platform: 'facebook' as const,
     profileUrl: 'https://facebook.com/techgabonsolutions',
@@ -47,7 +46,7 @@ const mockGabonCompanies = [
   {
     id: 'mock-3',
     name: 'Mode Gabonaise Authentique',
-    bio: 'Créations de mode inspirées de la culture gabonaise. Vêtements traditionnels et modernes. Entreprise 100% gabonaise basée à Franceville. #ModeGabonaise #CultureGabon',
+    bio: 'Créations de mode inspirées de la culture gabonaise. Vêtements traditionnels et modernes. Entreprise 100% gabonaise basée à Franceville. #ModeGabonaise #CultureGabon #Franceville',
     profileImage: 'https://via.placeholder.com/150/E91E63/FFFFFF?text=MGA',
     platform: 'facebook' as const,
     profileUrl: 'https://facebook.com/modegabonaise',
@@ -62,24 +61,57 @@ const mockGabonCompanies = [
       phone: '+241 01 55 44 33',
       email: 'contact@modegabonaise.ga'
     }
+  },
+  {
+    id: 'mock-4',
+    name: 'Immobilier Gabon Pro',
+    bio: 'Agence immobilière spécialisée dans l\'immobilier gabonais. Ventes, locations, investissements à Libreville et Port-Gentil. #ImmobilierGabon #Libreville #PortGentil',
+    profileImage: 'https://via.placeholder.com/150/FF9800/FFFFFF?text=IGP',
+    platform: 'facebook' as const,
+    profileUrl: 'https://facebook.com/immobiliergabonpro',
+    activityDomain: 'immobilier',
+    location: 'Libreville, Gabon',
+    followers: 3200,
+    verified: false,
+    gabonScore: 90,
+    hashtags: ['#ImmobilierGabon', '#Libreville', '#PortGentil', '#MadeInGabon'],
+    lastPostDate: new Date().toISOString(),
+    contactInfo: {
+      phone: '+241 01 77 88 99',
+      email: 'contact@immobiliergabon.ga'
+    }
+  },
+  {
+    id: 'mock-5',
+    name: 'Formation Gabon Excellence',
+    bio: 'Centre de formation professionnelle au Gabon. Cours de langues, informatique, management. Certifications reconnues. #FormationGabon #Education #Libreville',
+    profileImage: 'https://via.placeholder.com/150/9C27B0/FFFFFF?text=FGE',
+    platform: 'facebook' as const,
+    profileUrl: 'https://facebook.com/formationgabonexcellence',
+    activityDomain: 'formation',
+    location: 'Libreville, Gabon',
+    followers: 1800,
+    verified: false,
+    gabonScore: 87,
+    hashtags: ['#FormationGabon', '#Education', '#Libreville', '#MadeInGabon'],
+    lastPostDate: new Date().toISOString(),
+    contactInfo: {
+      phone: '+241 01 33 44 55',
+      email: 'info@formationgabon.ga'
+    }
   }
 ]
 
 export default defineEventHandler(async (event) => {
   try {
-    const { q = '', limit = '25', after = '', upsert = 'false' } = getQuery(event) as Record<string, string>
+    const { q = '', limit = '25', upsert = 'false' } = getQuery(event) as Record<string, string>
     const query = (q || '').trim()
     const lim = Math.min(Math.max(parseInt(String(limit), 10) || 25, 1), 100)
     const shouldUpsert = String(upsert).toLowerCase() === 'true'
 
-    // Pour l'instant, utiliser directement les données mock
-    // L'API Facebook sera activée plus tard quand les permissions seront validées
-    console.log('Utilisation des données mock pour le développement')
-
-    // Fallback vers les données mock si pas de query ou erreur Facebook
+    // Filtrer les entreprises selon la query
     let companies = mockGabonCompanies
 
-    // Filtrer par query si fournie
     if (query) {
       const queryLower = query.toLowerCase()
       companies = mockGabonCompanies.filter(company =>
@@ -125,14 +157,13 @@ export default defineEventHandler(async (event) => {
       success: true, 
       companies, 
       paging: null,
-      source: query ? 'facebook_api' : 'mock_data',
-      warning: query ? 'Utilisation des données mock en raison d\'une erreur Facebook API' : undefined
+      source: 'mock_data',
+      totalFound: companies.length,
+      searchQuery: query
     }
 
   } catch (e: any) {
-    console.error('Erreur recherche Facebook:', e)
-    return { success: false, companies: [], paging: null, error: 'server_error', message: 'Erreur recherche Facebook' }
+    console.error('Erreur recherche Facebook publique:', e)
+    return { success: false, companies: [], paging: null, error: 'server_error', message: 'Erreur recherche Facebook publique' }
   }
 })
-
-
