@@ -1,0 +1,84 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Search {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  prompt     String
+  hashtags   String[]
+  networks   String[]
+  lang       String?
+  maxResults Int?
+  results    Result[]
+}
+
+model Result {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  content    String
+  url        String?
+  author     String?
+  network    String
+  search     Search   @relation(fields: [searchId], references: [id])
+  searchId   String
+}
+
+model GabonCompany {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String
+  bio           String
+  profileImage  String
+  platform      String
+  profileUrl    String
+  activityDomain String
+  location      String
+  followers     Int
+  verified      Boolean  @default(false)
+  gabonScore    Int
+  hashtags      String[]
+  lastPostDate  DateTime
+  status        CompanyStatus @default(PENDING)
+  likes         CompanyLike[]
+  contactInfo   Json?
+  
+  @@unique([profileUrl])
+}
+
+model CompanyLike {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  company   GabonCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  isLike    Boolean  @default(true)
+  
+  @@unique([companyId, userId])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  firstName String
+  lastName  String
+  phone     String   @unique
+  email     String   @unique
+  likes     CompanyLike[]
+  
+  @@unique([email, phone])
+}
+
+enum CompanyStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}

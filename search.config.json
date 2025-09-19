@@ -1,0 +1,38 @@
+{
+  "prompt": "Trouve toutes les entreprises gabonaises sur les réseaux sociaux",
+  "hashtags": ["#gabon", "#gabonaise", "#entrepreneur", "#entreprise", "#libreville", "#portgentil", "#franceville", "#oyem", "#moanda", "#lambaréné", "#koulamoutou", "#makokou", "#bitam", "#tchibanga", "#mouila", "#ndendé", "#omboué", "#akanda", "#noya", "#100%gabonais", "#madeingabon", "#gabonais", "#gabonaise", "#gabonbusiness", "#gabonentrepreneur", "#gaboninnovation", "#gabontech", "#gabonstartup", "#gaboncommerce", "#gabonindustrie", "#gabonagriculture", "#gabontourisme", "#gabonimmobilier", "#gabonfinance", "#gabonconsulting", "#gabonformation", "#gabonmarketing", "#gaboncommunication", "#gabonmedia", "#gabonart", "#gabonculture", "#gabonmode", "#gabonbeauté", "#gabonsanté", "#gabonéducation", "#gabonsport", "#gabonévénement", "#gabonrestauration", "#gabonhôtellerie", "#gabontransport", "#gabonlogistique", "#gabonénergie", "#gabonpétrole", "#gabonmines", "#gabonbois", "#gabonmanganèse", "#gabonuranium", "#gabonpêche", "#gabonagriculture", "#gabonélevage", "#gabonpalmier", "#gaboncaoutchouc", "#gaboncafé", "#gaboncacao", "#gabonbanane", "#gabonmanioc", "#gabonigname", "#gabonplantain", "#gabonpatate", "#gabonlégumes", "#gabonfruits", "#gabonépices", "#gabonmiel", "#gabonapiculture", "#gabonaviculture", "#gabonporciculture", "#gabonbovin", "#gaboncaprin", "#gabonovin", "#gabonéquidés", "#gabonvolaille", "#gabonlapin", "#gabonrégion", "#gabonprovince", "#gabondépartement", "#gaboncommune", "#gabonville", "#gabonvillage", "#gabonquartier", "#gabonrue", "#gabonavenue", "#gabonboulevard", "#gabonplace", "#gabonmarché", "#gaboncentre", "#gabonzone", "#gabonpôle", "#gabonparc", "#gabonjardin", "#gabonplage", "#gabonmer", "#gabonocéan", "#gabonatlantique", "#gabonéquateur", "#gabontropique", "#gabonforêt", "#gabonsavane", "#gabonmangrove", "#gabonestuaire", "#gabonrivière", "#gabonfleuve", "#gabonlac", "#gabonlagune", "#gabonbaie", "#gabongolfe", "#gabonîle", "#gabonarchipel", "#gabonmontagne", "#gaboncolline", "#gabonplateau", "#gabonplaine", "#gabonvalée", "#gabonclimat", "#gabonsaison", "#gabonpluie", "#gabonsecheresse", "#gabonchaleur", "#gabonhumidité", "#gabonvent", "#gabonmousson", "#gabonharmattan", "#gabonbrouillard", "#gabonbrume", "#gabonrosée", "#gabonaurore", "#gaboncrépuscule", "#gabonjour", "#gabonnuit", "#gabonmatin", "#gabonmidi", "#gabonaprèsmidi", "#gabonsoir", "#gabonminuit", "#gabonaube", "#gabonlever", "#gaboncoucher", "#gabonsoleil", "#gabonlune", "#gabonétoile", "#gabonciel", "#gabonnuage", "#gabonorage", "#gabontonnerre", "#gabonéclair", "#gabonfoudre", "#gabonpluie", "#gabonaverse", "#gabonbruine", "#gabongrêle", "#gabonbrouillard", "#gabonbrume", "#gabonrosée", "#gabongivre", "#gabongelée", "#gabonchaleur", "#gabonfroid", "#gabontempérature", "#gabonmétéo", "#gabonclimat", "#gabonsaison", "#gabonprintemps", "#gabonété", "#gabonautomne", "#gabonhiver", "#gabondry", "#gabonwet", "#gabonpetite", "#gabongrande", "#gabonlongue", "#gaboncourte", "#gabonchaude", "#gabonfroide", "#gabonhumide", "#gabonsèche", "#gabonventeuse", "#gaboncalme", "#gabonbruyante", "#gabonsilencieuse", "#gabonanimée", "#gabonpaisible", "#gabonagréable", "#gabondésagréable", "#gabonbelle", "#gabonlaide", "#gabonjolie", "#gabonmoche", "#gabonmagnifique", "#gabonhorrible", "#gabonmerveilleuse", "#gabonterrible", "#gabonformidable", "#gabonépouvantable", "#gabonextraordinaire", "#gabonordinaire", "#gabonparticulière", "#gaboncommune", "#gabonunique", "#gabonmultiple", "#gabonrare", "#gabonfréquente", "#gabonhabituelle", "#gaboninusuelle", "#gabonnormale", "#gabonanormale", "#gabonrégulière", "#gabonirrégulière", "#gabonconstante", "#gabonvariable", "#gabonstable", "#gaboninstable", "#gabonfixe", "#gabonmobile", "#gabonstatique", "#gabondynamique", "#gabonimmobile", "#gabonmouvante", "#gabonreposante", "#gabonagitée", "#gabontranquille", "#gabonnerveuse", "#gaboncalme", "#gabonbruyante", "#gabonsilencieuse", "#gabonanimée", "#gabonpaisible", "#gabonagréable", "#gabondésagréable", "#gabonbelle", "#gabonlaide", "#gabonjolie", "#gabonmoche", "#gabonmagnifique", "#gabonhorrible", "#gabonmerveilleuse", "#gabonterrible", "#gabonformidable", "#gabonépouvantable", "#gabonextraordinaire", "#gabonordinaire", "#gabonparticulière", "#gaboncommune", "#gabonunique", "#gabonmultiple", "#gabonrare", "#gabonfréquente", "#gabonhabituelle", "#gaboninusuelle", "#gabonnormale", "#gabonanormale", "#gabonrégulière", "#gabonirrégulière", "#gabonconstante", "#gabonvariable", "#gabonstable", "#gaboninstable", "#gabonfixe", "#gabonmobile", "#gabonstatique", "#gabondynamique", "#gabonimmobile", "#gabonmouvante", "#gabonreposante", "#gabonagitée", "#gabontranquille", "#gabonnerveuse"],
+  "networks": ["facebook", "instagram", "tiktok", "twitter", "linkedin"],
+  "lang": "fr",
+  "maxResults": 50,
+  "gabonKeywords": [
+    "gabon", "gabonaise", "gabonais", "libreville", "port-gentil", "franceville", 
+    "oyem", "moanda", "lambaréné", "koulamoutou", "makokou", "bitam", "tchibanga", 
+    "mouila", "ndendé", "omboué", "akanda", "noya", "100% gabonais", "made in gabon",
+    "entreprise gabonaise", "entrepreneur gabonais", "business gabon", "gabon business",
+    "gabon entrepreneur", "gabon innovation", "gabon tech", "gabon startup",
+    "gabon commerce", "gabon industrie", "gabon agriculture", "gabon tourisme",
+    "gabon immobilier", "gabon finance", "gabon consulting", "gabon formation",
+    "gabon marketing", "gabon communication", "gabon media", "gabon art",
+    "gabon culture", "gabon mode", "gabon beauté", "gabon santé", "gabon éducation",
+    "gabon sport", "gabon événement", "gabon restauration", "gabon hôtellerie",
+    "gabon transport", "gabon logistique", "gabon énergie", "gabon pétrole",
+    "gabon mines", "gabon bois", "gabon manganèse", "gabon uranium", "gabon pêche"
+  ],
+  "companyIndicators": [
+    "entreprise", "sarl", "sa", "eurl", "sas", "sci", "snc", "sarlu", "sarl au",
+    "société", "compagnie", "groupe", "holding", "filiale", "succursale",
+    "agence", "bureau", "cabinet", "consulting", "conseil", "service",
+    "prestation", "solution", "innovation", "technologie", "digital",
+    "numérique", "informatique", "communication", "marketing", "publicité",
+    "création", "design", "graphisme", "web", "site", "application",
+    "développement", "programmation", "système", "réseau", "sécurité",
+    "formation", "éducation", "enseignement", "apprentissage", "coaching",
+    "accompagnement", "support", "assistance", "aide", "conseil",
+    "expertise", "spécialisation", "domaine", "secteur", "branche",
+    "activité", "métier", "profession", "carrière", "emploi", "recrutement",
+    "ressources humaines", "rh", "gestion", "management", "direction",
+    "administration", "comptabilité", "finance", "comptable", "expert",
+    "audit", "contrôle", "vérification", "inspection", "surveillance",
+    "sécurité", "protection", "défense", "garde", "vigilance", "attention"
+  ]
+}
