@@ -1,7 +1,4 @@
 {
-  "buildCommand": "pnpm run vercel-build",
-  "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install",
   "framework": "nuxtjs",
   "regions": ["iad1"],
   "env": {
@@ -14,11 +11,5 @@
     "GOOGLE_SEARCH_ENGINE_ID": "@google_search_engine_id",
     "USE_INSTAGRAM_API": "@use_instagram_api",
     "USE_TIKTOK_API": "@use_tiktok_api"
-  },
-  "build": {
-    "env": {
-      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true",
-      "PRISMA_CLI_BINARY_TARGETS": "rhel-openssl-3.0.x"
-    }
   }
 }

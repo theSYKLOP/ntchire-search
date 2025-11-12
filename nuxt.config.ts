@@ -37,22 +37,13 @@ export default defineNuxtConfig({
   
   // Configuration de build pour éviter les conflits
   build: {
-    transpile: ['@fortawesome/vue-fontawesome', '@prisma/client']
+    transpile: ['@fortawesome/vue-fontawesome']
   },
   
-  // Configuration Nitro pour Vercel et Prisma
+  // Configuration Nitro pour Vercel
   nitro: {
-    preset: 'vercel',
     experimental: {
-      wasm: false
-    },
-    esbuild: {
-      options: {
-        target: 'esnext'
-      }
-    },
-    rollupConfig: {
-      external: ['@prisma/client', '.prisma/client']
+      wasm: true
     }
   },
   
