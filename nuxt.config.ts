@@ -13,7 +13,6 @@ export default defineNuxtConfig({
   
   // Configuration des modules avec ordre optimisé
   modules: [
-    '@nuxt/eslint',
     '@nuxt/image',
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module'
