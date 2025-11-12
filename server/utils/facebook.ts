@@ -20,7 +20,7 @@ export interface FacebookSearchResult {
   paging?: { cursors?: { after?: string }, next?: string }
 }
 
-const FB_GRAPH_VERSION = process.env.FB_GRAPH_VERSION || 'v18.0'
+const FB_GRAPH_VERSION = process.env.FB_GRAPH_VERSION || 'v23.0'
 const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN || ''
 const FB_GRAPH_URL = `https://graph.facebook.com/${FB_GRAPH_VERSION}`
 
@@ -43,7 +43,7 @@ export async function searchPages(query: string, limit = 50, after?: string): Pr
   ensureConfigured()
   const fields = [
     'id', 'name', 'about', 'description', 'link', 'category', 'fan_count',
-    'picture.type(large){url}', 'location{city,country}'
+    'picture.type(large){url}', 'location{city,country}', 'website', 'emails', 'phone'
   ].join(',')
   const params: Record<string, string> = {
     q: query,
@@ -65,6 +65,52 @@ export async function searchPages(query: string, limit = 50, after?: string): Pr
   }
 }
 
+export async function searchPagesAdvanced(query: string, limit = 50): Promise<FacebookSearchResult> {
+  console.warn('Recherche Facebook desactivee: API Graph ne supporte plus /search')
+  console.warn('Alternative: Utilisez getPageById() pour recuperer des pages specifiques')
+  console.warn(`Requete ignoree: "${query}"`)
+  
+  return {
+    data: [],
+    paging: undefined
+  }
+}
+
+export async function getPageById(pageIdOrUsername: string): Promise<FacebookPageRaw | null> {
+  ensureConfigured()
+  
+  const fields = [
+    'id', 'name', 'about', 'description', 'link', 'category', 'fan_count',
+    'picture.type(large){url}', 'location{city,country}', 'website', 'emails', 'phone'
+  ].join(',')
+  
+  try {
+    const url = `${FB_GRAPH_URL}/${pageIdOrUsername}`
+    const { data } = await axios.get(url, { 
+      params: { fields, access_token: FB_ACCESS_TOKEN },
+      timeout: 12000
+    })
+    
+    console.log(`Page Facebook trouvee: ${data.name}`)
+    return data as FacebookPageRaw
+  } catch (err: any) {
+    const status = err?.response?.status
+    const msg = err?.response?.data?.error?.message || err?.message || 'Erreur Facebook API'
+    console.error(`Erreur recuperation page ${pageIdOrUsername}:`, msg)
+    return null
+  }
+}
+
+export async function searchPagesByCategory(category: string, location?: string, limit = 50): Promise<FacebookSearchResult> {
+  console.warn('Recherche par categorie desactivee: API Graph ne supporte plus /search')
+  console.warn(`Categorie ignoree: "${category}"${location ? ` a ${location}` : ''}`)
+  
+  return {
+    data: [],
+    paging: undefined
+  }
+}
+
 export function mapFacebookPageToCompany(page: FacebookPageRaw) {
   return {
     externalId: page.id,
@@ -73,11 +119,9 @@ export function mapFacebookPageToCompany(page: FacebookPageRaw) {
     profileImage: page.picture?.data?.url || '',
     platform: 'facebook',
     profileUrl: page.link || (page.id ? `https://facebook.com/${page.id}` : ''),
-    activityDomain: page.category || 'non spécifié',
+    activityDomain: page.category || 'non specifie',
     location: [page.location?.city, page.location?.country].filter(Boolean).join(', '),
     followers: page.fan_count || 0,
     hashtags: [] as string[]
   }
 }
-
-

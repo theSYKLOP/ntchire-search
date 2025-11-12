@@ -1,94 +1,190 @@
 import { PrismaClient } from '@prisma/client'
-import { searchPages, mapFacebookPageToCompany, FacebookApiError } from '../../utils/facebook'
+import { searchPagesAdvanced, searchPagesByCategory, mapFacebookPageToCompany, FacebookApiError } from '../../utils/facebook'
 import { analyzeGabonCompany } from '../../utils/huggingface'
+import { performFallbackSearch, searchByHashtag } from '../../utils/fallback-search'
 
 const prisma = new PrismaClient()
 
-// Données mock pour le développement
+// Données mock supprimées - utilisation des APIs réelles uniquement
 const mockGabonCompanies = [
-  {
-    id: 'mock-1',
-    name: 'Restaurant Le Gabonais',
-    bio: 'Restaurant traditionnel gabonais à Libreville. Spécialités locales, poissons frais, plantain et manioc. #Gabon #Libreville #RestaurantGabonais',
-    profileImage: 'https://via.placeholder.com/150/4CAF50/FFFFFF?text=RG',
-    platform: 'facebook' as const,
-    profileUrl: 'https://facebook.com/restaurant-legabonais',
-    activityDomain: 'restauration',
-    location: 'Libreville, Gabon',
-    followers: 1250,
-    verified: false,
-    gabonScore: 85,
-    hashtags: ['#Gabon', '#Libreville', '#RestaurantGabonais', '#MadeInGabon'],
-    lastPostDate: new Date().toISOString(),
-    contactInfo: {
-      phone: '+241 01 23 45 67',
-      email: 'contact@legabonais.ga'
-    }
-  },
-  {
-    id: 'mock-2',
-    name: 'Tech Gabon Solutions',
-    bio: 'Solutions technologiques pour les entreprises gabonaises. Développement web, applications mobiles, digitalisation. 100% gabonais ! #GabonTech #InnovationGabon',
-    profileImage: 'https://via.placeholder.com/150/2196F3/FFFFFF?text=TGS',
-    platform: 'facebook' as const,
-    profileUrl: 'https://facebook.com/techgabonsolutions',
-    activityDomain: 'technologie',
-    location: 'Port-Gentil, Gabon',
-    followers: 890,
-    verified: false,
-    gabonScore: 92,
-    hashtags: ['#GabonTech', '#InnovationGabon', '#MadeInGabon', '#PortGentil'],
-    lastPostDate: new Date().toISOString(),
-    contactInfo: {
-      phone: '+241 01 98 76 54',
-      email: 'info@techgabon.ga'
-    }
-  },
-  {
-    id: 'mock-3',
-    name: 'Mode Gabonaise Authentique',
-    bio: 'Créations de mode inspirées de la culture gabonaise. Vêtements traditionnels et modernes. Entreprise 100% gabonaise basée à Franceville. #ModeGabonaise #CultureGabon',
-    profileImage: 'https://via.placeholder.com/150/E91E63/FFFFFF?text=MGA',
-    platform: 'facebook' as const,
-    profileUrl: 'https://facebook.com/modegabonaise',
-    activityDomain: 'mode',
-    location: 'Franceville, Gabon',
-    followers: 2100,
-    verified: false,
-    gabonScore: 88,
-    hashtags: ['#ModeGabonaise', '#CultureGabon', '#Franceville', '#MadeInGabon'],
-    lastPostDate: new Date().toISOString(),
-    contactInfo: {
-      phone: '+241 01 55 44 33',
-      email: 'contact@modegabonaise.ga'
-    }
-  }
 ]
 
 export default defineEventHandler(async (event) => {
   try {
-    const { q = '', limit = '25', after = '', upsert = 'false' } = getQuery(event) as Record<string, string>
+    const { 
+      q = '', 
+      limit = '25', 
+      upsert = 'false',
+      platforms = 'facebook,instagram,tiktok,google',
+      useFallback = 'true',
+      hashtag = ''
+    } = getQuery(event) as Record<string, string>
+    
     const query = (q || '').trim()
     const lim = Math.min(Math.max(parseInt(String(limit), 10) || 25, 1), 100)
     const shouldUpsert = String(upsert).toLowerCase() === 'true'
+    const platformList = platforms.split(',').filter(p => ['facebook', 'instagram', 'tiktok', 'google'].includes(p)) as ('facebook' | 'instagram' | 'tiktok' | 'google')[]
+    const enableFallback = String(useFallback).toLowerCase() === 'true'
+    const hashtagQuery = hashtag.trim()
 
-    // Pour l'instant, utiliser directement les données mock
-    // L'API Facebook sera activée plus tard quand les permissions seront validées
-    console.log('Utilisation des données mock pour le développement')
+    // Recherche par hashtag si spécifié
+    if (hashtagQuery) {
+      console.log(`🏷️ Recherche par hashtag: "${hashtagQuery}"`)
+      const hashtagResults = await searchByHashtag(hashtagQuery, lim)
+      
+      return {
+        success: true,
+        companies: hashtagResults.companies,
+        paging: null,
+        source: 'hashtag_search',
+        platforms: hashtagResults.sources,
+        totalResults: hashtagResults.totalResults,
+        errors: hashtagResults.errors,
+        warning: hashtagResults.errors.length > 0 ? `Erreurs: ${hashtagResults.errors.join(', ')}` : undefined
+      }
+    }
 
-    // Fallback vers les données mock si pas de query ou erreur Facebook
-    let companies = mockGabonCompanies
+    // Recherche multi-plateforme avec fallback
+    let fallbackResults: { companies: unknown[]; sources: string[]; totalResults: number; errors: string[] } | null = null
+    let fallbackError: string | null = null
+    
+    if (query && enableFallback) {
+      try {
+        console.log(`🔍 Recherche multi-plateforme pour: "${query}"`)
+        console.log(`📱 Plateformes: ${platformList.join(', ')}`)
+        
+        fallbackResults = await performFallbackSearch({
+          query,
+          limit: lim,
+          platforms: platformList,
+          useFallback: enableFallback
+        })
+        
+        console.log(`✅ Fallback search: ${fallbackResults.companies.length} entreprises trouvées`)
+        console.log(`📊 Sources: ${fallbackResults.sources.join(', ')}`)
+        
+        if (fallbackResults.errors.length > 0) {
+          console.warn(`⚠️ Erreurs fallback: ${fallbackResults.errors.join(', ')}`)
+        }
+      } catch (e: unknown) {
+        fallbackError = e instanceof Error ? e.message : 'Erreur inconnue'
+        console.error('❌ Erreur fallback search:', e)
+      }
+    }
 
-    // Filtrer par query si fournie
-    if (query) {
-      const queryLower = query.toLowerCase()
-      companies = mockGabonCompanies.filter(company =>
+    // Fallback vers l'ancienne méthode Facebook si nécessaire
+    let facebookResults: unknown[] = []
+    let facebookError: string | null = null
+    
+    if (!fallbackResults || fallbackResults.companies.length < 5) {
+      try {
+        if (query) {
+          console.log(`🔍 Recherche Facebook classique pour: "${query}"`)
+          console.log(`🔑 Token configuré:`, process.env.FB_ACCESS_TOKEN ? 'Oui' : 'Non')
+          
+          const fb = await searchPagesAdvanced(query, Math.ceil(lim * 0.6))
+          facebookResults = fb.data || []
+          
+          console.log(`📊 Facebook API trouvé ${facebookResults.length} pages`)
+          
+          // Si pas assez de résultats, essayer par catégorie
+          if (facebookResults.length < 5) {
+            console.log(`🔄 Pas assez de résultats, essai par catégorie...`)
+            const categoryQueries = ['restaurant', 'commerce', 'entreprise', 'business', 'service']
+            for (const category of categoryQueries) {
+              if (query.toLowerCase().includes(category) || category.includes(query.toLowerCase())) {
+                try {
+                  console.log(`🏷️ Recherche catégorie: ${category}`)
+                  const categoryResult = await searchPagesByCategory(category, 'Gabon', 10)
+                const newPages = categoryResult.data.filter(page => 
+                  !facebookResults.some((existing: any) => (existing as any).id === page.id)
+                )
+                  facebookResults.push(...newPages)
+                  console.log(`✅ Ajouté ${newPages.length} pages de la catégorie ${category}`)
+                } catch (e: unknown) {
+                  const errorMessage = e instanceof Error ? e.message : 'Erreur inconnue'
+                  console.warn(`❌ Erreur recherche catégorie ${category}:`, errorMessage)
+                }
+              }
+            }
+          }
+        } else {
+          console.log(`⚠️ Pas de query fournie, utilisation des données mock`)
+        }
+      } catch (e: unknown) {
+        if (e instanceof FacebookApiError) {
+          facebookError = e.message
+          console.warn('❌ Erreur Facebook API:', e.message)
+        } else {
+          console.error('❌ Erreur non-Facebook:', e)
+          facebookError = 'Erreur inconnue'
+        }
+      }
+    }
+
+    // Combiner tous les résultats
+    let companies: unknown[] = []
+    
+    // Ajouter les résultats du fallback search
+    if (fallbackResults && fallbackResults.companies.length > 0) {
+      companies.push(...fallbackResults.companies)
+    }
+    
+    // Ajouter les résultats Facebook classiques si pas assez de résultats
+    if (companies.length < lim) {
+      const facebookCompanies: unknown[] = []
+      
+      for (const page of facebookResults) {
+        try {
+          const mapped = mapFacebookPageToCompany(page as any)
+          const analysis = analyzeGabonCompany(mapped.bio, mapped.bio, mapped.hashtags)
+          
+          // Ne garder que les entreprises gabonaises
+          if (analysis.isGabonCompany) {
+            const item = {
+              ...mapped,
+              activityDomain: analysis.activityDomain,
+              location: mapped.location || analysis.locationIndicators.join(', ') || 'Gabon',
+              gabonScore: analysis.gabonScore,
+              verified: false,
+              hashtags: mapped.hashtags || [],
+              lastPostDate: new Date().toISOString(),
+              contactInfo: {
+                phone: (page as any).phone || '',
+                email: (page as any).emails?.[0] || '',
+                website: (page as any).website || ''
+              }
+            }
+            facebookCompanies.push(item)
+          }
+        } catch (e: unknown) {
+          console.warn('Erreur traitement page Facebook:', e)
+        }
+      }
+      
+      // Éviter les doublons avec les résultats fallback
+      const existingUrls = new Set(companies.map((c: any) => c.profileUrl))
+      const newFacebookCompanies = facebookCompanies.filter((c: any) => !existingUrls.has(c.profileUrl))
+      companies.push(...newFacebookCompanies)
+    }
+    
+    // Ajouter des données mock si pas assez de résultats
+    if (companies.length < lim) {
+      const queryLower = query ? query.toLowerCase() : ''
+      const mockFiltered = mockGabonCompanies.filter(company =>
+        !queryLower || 
         company.name.toLowerCase().includes(queryLower) ||
         company.bio.toLowerCase().includes(queryLower) ||
         company.activityDomain.toLowerCase().includes(queryLower) ||
         company.location.toLowerCase().includes(queryLower) ||
         company.hashtags.some(tag => tag.toLowerCase().includes(queryLower))
       )
+      
+      // Éviter les doublons
+      const existingUrls = new Set(companies.map((c: any) => c.profileUrl))
+      const newMockCompanies = mockFiltered.filter((c: any) => !existingUrls.has(c.profileUrl))
+      
+      companies.push(...newMockCompanies)
     }
 
     // Limiter les résultats
@@ -97,20 +193,21 @@ export default defineEventHandler(async (event) => {
     // Upsert si demandé
     if (shouldUpsert) {
       for (const company of companies) {
+        const companyData = company as any
         const data = {
-          name: company.name,
-          bio: company.bio,
-          profileImage: company.profileImage,
-          platform: company.platform,
-          profileUrl: company.profileUrl,
-          activityDomain: company.activityDomain,
-          location: company.location,
-          followers: company.followers,
-          verified: company.verified,
-          gabonScore: company.gabonScore,
-          hashtags: company.hashtags,
-          lastPostDate: new Date(company.lastPostDate),
-          contactInfo: company.contactInfo
+          name: companyData.name,
+          bio: companyData.bio,
+          profileImage: companyData.profileImage,
+          platform: companyData.platform,
+          profileUrl: companyData.profileUrl,
+          activityDomain: companyData.activityDomain,
+          location: companyData.location,
+          followers: companyData.followers,
+          verified: companyData.verified,
+          gabonScore: companyData.gabonScore,
+          hashtags: companyData.hashtags,
+          lastPostDate: new Date(companyData.lastPostDate),
+          contactInfo: companyData.contactInfo
         }
         const existing = await prisma.gabonCompany.findUnique({ where: { profileUrl: data.profileUrl } })
         if (existing) {
@@ -121,15 +218,44 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Déterminer les sources utilisées
+    const sources = []
+    if (fallbackResults && fallbackResults.sources.length > 0) {
+      sources.push(...fallbackResults.sources)
+    }
+    if (facebookResults.length > 0) {
+      sources.push('facebook')
+    }
+    if (companies.length > (fallbackResults?.companies.length || 0) + facebookResults.length) {
+      sources.push('mock_data')
+    }
+    
+    // Compter les résultats par source
+    const facebookCount = facebookResults.length
+    const fallbackCount = fallbackResults?.companies.length || 0
+    const mockCount = companies.length - fallbackCount - facebookCount
+    
     return { 
       success: true, 
       companies, 
       paging: null,
-      source: query ? 'facebook_api' : 'mock_data',
-      warning: query ? 'Utilisation des données mock en raison d\'une erreur Facebook API' : undefined
+      source: sources.length > 0 ? sources.join(',') : 'mixed',
+      platforms: sources,
+      totalResults: companies.length,
+      facebookResults: facebookCount,
+      fallbackResults: fallbackCount,
+      mockResults: mockCount,
+      errors: [
+        ...(fallbackResults?.errors || []),
+        ...(facebookError ? [`Facebook: ${facebookError}`] : []),
+        ...(fallbackError ? [`Fallback: ${fallbackError}`] : [])
+      ],
+      warning: (facebookError || fallbackError) ? 
+        `Erreurs: ${[facebookError, fallbackError].filter(Boolean).join(', ')}. Utilisation des données disponibles.` : 
+        undefined
     }
 
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Erreur recherche Facebook:', e)
     return { success: false, companies: [], paging: null, error: 'server_error', message: 'Erreur recherche Facebook' }
   }

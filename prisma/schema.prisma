@@ -30,25 +30,92 @@ model Result {
   searchId   String
 }
 
+// Cache de recherche pour optimiser les appels API
+model SearchCache {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  expiresAt     DateTime
+  
+  // Clés de recherche normalisées
+  queryHash     String   @unique
+  query         String
+  hashtags      String[]
+  networks      String[]
+  lang          String?
+  
+  // Résultats mis en cache
+  results       Json     // Stocke les résultats de recherche
+  totalFound    Int
+  
+  // Métadonnées
+  hitCount      Int      @default(0)  // Nombre de fois où ce cache a été utilisé
+  lastAccessed  DateTime @default(now())
+  source        String   @default("database")  // "database", "google", "facebook", etc.
+  
+  @@index([queryHash])
+  @@index([expiresAt])
+}
+
 model GabonCompany {
   id            String   @id @default(uuid())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   name          String
-  bio           String
-  profileImage  String
+  bio           String?
+  profileImage  String?
   platform      String
   profileUrl    String
   activityDomain String
-  location      String
-  followers     Int
+  location      String?
+  city          String?
+  followers     Int      @default(0)
   verified      Boolean  @default(false)
-  gabonScore    Int
+  gabonScore    Int      @default(0)
   hashtags      String[]
-  lastPostDate  DateTime
+  lastPostDate  DateTime?
   status        CompanyStatus @default(PENDING)
   likes         CompanyLike[]
-  contactInfo   Json?
+  
+  // Informations de contact enrichies
+  phone         String?
+  email         String?
+  website       String?
+  address       String?
+  whatsapp      String?
+  
+  // Horaires d'ouverture (JSON pour flexibilité)
+  openingHours  Json?
+  
+  // Réseaux sociaux supplémentaires
+  facebookUrl   String?
+  instagramUrl  String?
+  tiktokUrl     String?
+  linkedinUrl   String?
+  twitterUrl    String?
+  youtubeUrl    String?
+  
+  // Informations métier
+  category      String?
+  subcategory   String?
+  description   String?
+  services      String[]
+  yearFounded   Int?
+  employeeCount String?
+  
+  // Géolocalisation
+  latitude      Float?
+  longitude     Float?
+  
+  // Informations supplémentaires extraites par IA
+  reviewCount   Int?
+  averageRating Float?
+  priceRange    String?
+  
+  // Métadonnées d'extraction
+  lastScraped   DateTime @default(now())
+  dataSource    String   @default("manual")
+  dataQuality   Int      @default(0) // Score de qualité des données 0-100
   
   @@unique([profileUrl])
 }

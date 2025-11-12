@@ -48,11 +48,41 @@ export default defineNuxtConfig({
     },
     define: {
       'process.env.DEBUG': false
-    }
+    },
+    css: {
+      postcss: {
+        plugins: [
+          require('tailwindcss'),
+          require('autoprefixer'),
+        ],
+      },
+    },
+    server: {
+      fs: {
+        // Autoriser uniquement ce workspace pour éviter les erreurs "outside of serving allow list"
+        strict: true,
+        allow: [
+          // Workspace root
+          process.cwd(),
+          // Node modules du projet
+          require('path').join(process.cwd(), 'node_modules')
+        ]
+      },
+      hmr: {
+        overlay: true,
+      },
+    },
   },
   
   // Configuration SSR optimisée
   ssr: true,
+  
+  // Configuration du routeur pour éviter les warnings dev-sw.js
+  router: {
+    options: {
+      strict: false
+    }
+  },
   
   // Configuration des plugins avec ordre optimisé
   plugins: [

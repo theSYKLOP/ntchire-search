@@ -9,12 +9,13 @@ import {
 import {
   faFacebook,
   faTiktok,
-  faInstagram
+  faInstagram,
+  faTwitter,
+  faLinkedin
 } from '@fortawesome/free-brands-svg-icons'
 
 // Configuration optimisée pour éviter les conflits d'initialisation
 config.autoAddCss = false
-config.autoReplaceSvg = 'nest'
 
 // Ajout des icônes de manière optimisée
 library.add(
@@ -24,12 +25,13 @@ library.add(
   faHeart,
   faFacebook,
   faTiktok,
-  faInstagram
+  faInstagram,
+  faTwitter,
+  faLinkedin
 )
 
 export default defineNuxtPlugin((nuxtApp) => {
-  // Enregistrement sécurisé du composant avec vérification
-  if (nuxtApp.vueApp && !nuxtApp.vueApp.component('font-awesome-icon')) {
-    nuxtApp.vueApp.component('font-awesome-icon', FontAwesomeIcon)
-  }
+  // Enregistrement global du composant FontAwesome (les deux formats)
+  nuxtApp.vueApp.component('FontAwesomeIcon', FontAwesomeIcon)
+  nuxtApp.vueApp.component('font-awesome-icon', FontAwesomeIcon)
 })
