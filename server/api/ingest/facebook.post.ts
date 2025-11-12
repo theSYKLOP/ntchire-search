@@ -1,8 +1,7 @@
-import prisma from '../utils/prisma'
+import prisma from '../../utils/prisma'
 import { analyzeGabonCompany } from '../../utils/huggingface'
 import { FacebookApiError, mapFacebookPageToCompany, searchPages } from '../../utils/facebook'
 
-const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {

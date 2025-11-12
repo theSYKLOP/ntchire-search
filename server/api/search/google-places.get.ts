@@ -1,6 +1,6 @@
 import { searchGooglePlaces, mapGooglePlaceToCompany } from '../../utils/google'
 import { extractCompanyInfo } from '../../utils/huggingface'
-import prisma from '../utils/prisma'
+import prisma from '../../utils/prisma'
 
 // Types d'activités connues au Gabon
 const ACTIVITY_TYPES = [

@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma';
+import prisma from '../../utils/prisma';
 import { GabonCompany } from '../../utils/huggingface';
 
 const prisma = new PrismaClient();

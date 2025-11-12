@@ -1,7 +1,6 @@
-import prisma from '../utils/prisma'
+import prisma from '../../utils/prisma'
 import { analyzeGabonCompany } from '../../utils/huggingface'
 
-const prisma = new PrismaClient()
 
 // Données mock supprimées - utilisation des APIs réelles uniquement
 const mockGabonCompanies = [

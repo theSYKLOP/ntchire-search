@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma';
+import prisma from './prisma';
 const HF_API_TOKEN = process.env.HF_API_TOKEN;
 
 /**

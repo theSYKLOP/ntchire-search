@@ -1,9 +1,8 @@
-import prisma from '../utils/prisma'
+import prisma from '../../utils/prisma'
 import { searchPagesAdvanced, searchPagesByCategory, mapFacebookPageToCompany, FacebookApiError } from '../../utils/facebook'
 import { analyzeGabonCompany } from '../../utils/huggingface'
 import { performFallbackSearch, searchByHashtag } from '../../utils/fallback-search'
 
-const prisma = new PrismaClient()
 
 // Données mock supprimées - utilisation des APIs réelles uniquement
 const mockGabonCompanies = [
