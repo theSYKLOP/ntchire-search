@@ -1,0 +1,13 @@
+# Ignorer les fichiers inutiles pour le déploiement
+node_modules
+.nuxt
+.output
+.env.local
+.DS_Store
+*.log
+pnpm-debug.log*
+.vscode
+.idea
+
+# Ne pas ignorer prisma pour la génération
+!prisma/
