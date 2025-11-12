@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import prisma from '../utils/prisma'
 import { searchPagesAdvanced, searchPagesByCategory, mapFacebookPageToCompany, FacebookApiError } from '../../utils/facebook'
 import { analyzeGabonCompany } from '../../utils/huggingface'
 import { performFallbackSearch, searchByHashtag } from '../../utils/fallback-search'

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { generateQuery, type GabonCompany } from '../utils/huggingface';
@@ -10,8 +10,6 @@ import {
 import { smartDatabaseSearch, findSimilarCachedQueries } from '../utils/smart-search';
 import type { SearchOptions } from '../utils/types';
 import { searchMockCompanies, MOCK_GABON_COMPANIES } from '../utils/mock-data';
-
-const prisma = new PrismaClient();
 
 // Utilisation des données mock importées
 const mockGabonCompanies: GabonCompany[] = MOCK_GABON_COMPANIES as any[];

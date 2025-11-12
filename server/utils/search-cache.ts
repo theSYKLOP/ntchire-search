@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from './prisma';
 import crypto from 'crypto';
 import type { SearchOptions, SearchResults } from './types';
-
-const prisma = new PrismaClient();
 
 // Durée de validité du cache en heures (7 jours = 168 heures)
 const CACHE_DURATION_HOURS = 168;
