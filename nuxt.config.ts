@@ -47,6 +47,24 @@ export default defineNuxtConfig({
     }
   },
   
+  // Hook pour générer Prisma Client avant le build
+  hooks: {
+    'build:before': async () => {
+      const { exec } = await import('child_process')
+      const { promisify } = await import('util')
+      const execPromise = promisify(exec)
+      
+      try {
+        console.log('🔧 Generating Prisma Client...')
+        await execPromise('npx prisma generate')
+        console.log('✅ Prisma Client generated successfully')
+      } catch (error) {
+        console.error('❌ Failed to generate Prisma Client:', error)
+        throw error
+      }
+    }
+  },
+  
   // Configuration Vite pour résoudre les problèmes d'initialisation
   vite: {
     optimizeDeps: {
